@@ -1,0 +1,1467 @@
+<!doctype html>
+<html lang="th" class="h-full">
+ <head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Safe Space</title>
+  <script src="/_sdk/element_sdk.js"></script>
+  <script src="/_sdk/data_sdk.js"></script>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Quicksand:wght@300;400;500;600;700&amp;family=Caveat:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+html, body { height: 100%; margin: 0; padding: 0; }
+body { font-family: 'Quicksand', 'Noto Sans Thai', sans-serif; overflow: hidden; }
+* { box-sizing: border-box; }
+:root {
+  --bg-gradient-1: #fce4f2;
+  --bg-gradient-2: #dbeafe;
+  --bg-gradient-3: #f0e6ff;
+  --card-bg: #ffffff;
+  --text-primary: #4a3560;
+  --text-secondary: #7c6c8a;
+  --accent-pink: #f9a8d4;
+  --accent-blue: #93c5fd;
+  --accent-purple: #c4b5fd;
+  --btn-primary: linear-gradient(135deg, #f9a8d4, #93c5fd);
+  --btn-hover: linear-gradient(135deg, #f472b6, #60a5fa);
+}
+.app-wrapper {
+  width: 100%; height: 100%;
+  background: linear-gradient(160deg, var(--bg-gradient-1) 0%, var(--bg-gradient-2) 50%, var(--bg-gradient-3) 100%);
+  overflow-y: auto; overflow-x: hidden;
+  position: relative;
+}
+.cloud {
+  position: fixed; opacity: 0.3; pointer-events: none; z-index: 0;
+  animation: floatCloud 20s ease-in-out infinite;
+}
+.cloud:nth-child(2) { animation-delay: -5s; animation-duration: 25s; }
+.cloud:nth-child(3) { animation-delay: -10s; animation-duration: 30s; }
+@keyframes floatCloud {
+  0%, 100% { transform: translateX(0) translateY(0); }
+  25% { transform: translateX(20px) translateY(-10px); }
+  50% { transform: translateX(-10px) translateY(5px); }
+  75% { transform: translateX(15px) translateY(-5px); }
+}
+.paper-rocket {
+  position: fixed; opacity: 0.15; pointer-events: none; z-index: 0;
+  animation: rocketFloat 15s ease-in-out infinite;
+}
+@keyframes rocketFloat {
+  0%, 100% { transform: translateY(0) rotate(-10deg); }
+  50% { transform: translateY(-30px) rotate(10deg); }
+}
+.glass-card {
+  background: rgba(255,255,255,0.75);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(255,255,255,0.5);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(147,100,200,0.1);
+}
+.btn-gradient {
+  background: var(--btn-primary);
+  color: white; border: none; border-radius: 14px;
+  font-weight: 600; cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(249,168,212,0.3);
+  font-family: 'Quicksand', 'Noto Sans Thai', sans-serif;
+}
+.btn-gradient:hover {
+  background: var(--btn-hover);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(249,168,212,0.4);
+}
+.btn-gradient:disabled {
+  opacity: 0.5; cursor: not-allowed; transform: none;
+}
+.page { display: none; width: 100%; height: 100%; position: relative; z-index: 1; }
+.page.active { display: flex; flex-direction: column; }
+.input-field {
+  width: 100%; padding: 12px 16px;
+  border: 2px solid rgba(196,181,253,0.3);
+  border-radius: 12px; background: rgba(255,255,255,0.6);
+  font-family: 'Quicksand', 'Noto Sans Thai', sans-serif; font-size: 14px;
+  color: var(--text-primary); outline: none;
+  transition: border-color 0.3s;
+}
+.input-field:focus { border-color: var(--accent-pink); }
+.bottom-nav {
+  display: flex; justify-content: space-around; align-items: center;
+  padding: 8px 0; background: rgba(255,255,255,0.85);
+  backdrop-filter: blur(10px); border-top: 1px solid rgba(196,181,253,0.2);
+  position: sticky; bottom: 0; z-index: 10; flex-shrink: 0;
+}
+.nav-item {
+  display: flex; flex-direction: column; align-items: center;
+  cursor: pointer; padding: 4px 8px; transition: all 0.2s;
+  color: var(--text-secondary); font-size: 10px; gap: 2px;
+}
+.nav-item.active { color: #ec4899; }
+.nav-item svg { width: 24px; height: 24px; }
+.banner-slide {
+  display: flex; align-items: center; justify-content: center;
+  min-width: 100%; height: 100%; padding: 16px;
+  font-family: 'Caveat', cursive; font-size: 22px;
+  color: var(--text-primary); text-align: center;
+}
+.banner-container {
+  overflow: hidden; border-radius: 16px;
+  background: linear-gradient(135deg, rgba(249,168,212,0.2), rgba(147,197,253,0.2));
+  height: 80px; position: relative;
+}
+.banner-track {
+  display: flex; transition: transform 0.6s ease;
+  height: 100%;
+}
+.feature-card {
+  background: rgba(255,255,255,0.7); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.5); border-radius: 16px;
+  padding: 20px; cursor: pointer; transition: all 0.3s;
+}
+.feature-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(147,100,200,0.15); }
+.chat-bubble {
+  max-width: 80%; padding: 10px 14px; border-radius: 16px;
+  font-size: 14px; line-height: 1.4; word-wrap: break-word;
+  animation: fadeInUp 0.3s ease;
+}
+.chat-bubble.sent {
+  background: linear-gradient(135deg, #f9a8d4, #c4b5fd);
+  color: white; align-self: flex-end; border-bottom-right-radius: 4px;
+}
+.chat-bubble.received {
+  background: rgba(255,255,255,0.8); color: var(--text-primary);
+  align-self: flex-start; border-bottom-left-radius: 4px;
+}
+.chat-bubble.waiting {
+  background: rgba(196,181,253,0.15); color: var(--text-primary);
+  align-self: flex-start; border-bottom-left-radius: 4px;
+  font-style: italic;
+}
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.post-card {
+  background: rgba(255,255,255,0.7); backdrop-filter: blur(8px);
+  border: 1px solid rgba(255,255,255,0.4); border-radius: 14px;
+  padding: 14px; margin-bottom: 10px; animation: fadeInUp 0.3s ease;
+}
+.toast {
+  position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
+  background: rgba(255,255,255,0.9); backdrop-filter: blur(10px);
+  padding: 10px 20px; border-radius: 12px; z-index: 999;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.1); font-size: 14px;
+  color: var(--text-primary); animation: toastIn 0.3s ease;
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+  to { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+.sentiment-bar {
+  height: 8px; border-radius: 4px; transition: width 0.5s ease;
+}
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(196,181,253,0.3); border-radius: 2px; }
+.profile-avatar {
+  width: 40px; height: 40px; border-radius: 50%;
+  background: linear-gradient(135deg, #f9a8d4, #93c5fd);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; cursor: pointer; flex-shrink: 0;
+}
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.3);
+  backdrop-filter: blur(4px); z-index: 50;
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.2s ease;
+}
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+.quiz-option {
+  padding: 10px 14px; border: 2px solid rgba(196,181,253,0.3);
+  border-radius: 12px; cursor: pointer; transition: all 0.2s;
+  font-size: 14px;
+}
+.quiz-option:hover { border-color: var(--accent-pink); background: rgba(249,168,212,0.1); }
+.quiz-option.selected { border-color: #ec4899; background: rgba(249,168,212,0.2); }
+.expert-badge {
+  background: linear-gradient(135deg, #fbbf24, #f59e0b);
+  color: white; padding: 4px 10px; border-radius: 12px;
+  font-size: 11px; font-weight: 600;
+}
+.pending-badge {
+  background: linear-gradient(135deg, #a78bfa, #c4b5fd);
+  color: white; padding: 4px 10px; border-radius: 12px;
+  font-size: 11px; font-weight: 600;
+}
+.error-text {
+  color: #ef4444; font-size: 12px; margin-top: 4px;
+}
+</style>
+  <style>body { box-sizing: border-box; }</style>
+ </head>
+ <body class="h-full">
+  <div class="app-wrapper" id="appWrapper"><!-- Clouds -->
+   <svg class="cloud" style="top:5%;left:5%;width:120px" viewbox="0 0 200 100">
+    <ellipse cx="70" cy="60" rx="60" ry="30" fill="#f9a8d4" opacity="0.4" /><ellipse cx="110" cy="50" rx="50" ry="35" fill="#93c5fd" opacity="0.4" /><ellipse cx="150" cy="60" rx="40" ry="25" fill="#c4b5fd" opacity="0.4" />
+   </svg>
+   <svg class="cloud" style="top:15%;right:10%;width:100px" viewbox="0 0 200 100">
+    <ellipse cx="70" cy="60" rx="55" ry="28" fill="#93c5fd" opacity="0.4" /><ellipse cx="120" cy="50" rx="45" ry="30" fill="#f9a8d4" opacity="0.4" />
+   </svg>
+   <svg class="cloud" style="bottom:20%;left:15%;width:90px" viewbox="0 0 200 100">
+    <ellipse cx="80" cy="55" rx="50" ry="25" fill="#c4b5fd" opacity="0.4" /><ellipse cx="130" cy="50" rx="40" ry="28" fill="#93c5fd" opacity="0.4" />
+   </svg><!-- Paper Rockets -->
+   <svg class="paper-rocket" style="top:10%;right:20%;width:50px" viewbox="0 0 60 60">
+    <path d="M30 5 L45 50 L30 40 L15 50 Z" fill="#f9a8d4" stroke="#e879a8" stroke-width="1" /><line x1="30" y1="40" x2="30" y2="55" stroke="#93c5fd" stroke-width="1.5" /><line x1="25" y1="42" x2="20" y2="55" stroke="#c4b5fd" stroke-width="1" /><line x1="35" y1="42" x2="40" y2="55" stroke="#c4b5fd" stroke-width="1" />
+   </svg>
+   <svg class="paper-rocket" style="bottom:30%;right:8%;width:40px" viewbox="0 0 60 60">
+    <path d="M30 5 L45 50 L30 40 L15 50 Z" fill="#93c5fd" stroke="#60a5fa" stroke-width="1" /><line x1="30" y1="40" x2="30" y2="55" stroke="#f9a8d4" stroke-width="1.5" />
+   </svg><!-- ============ LOGIN PAGE ============ -->
+   <div id="loginPage" class="page active" style="align-items:center;justify-content:center;padding:20px;">
+    <div class="glass-card" style="width:100%;max-width:380px;padding:32px;">
+     <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:40px;margin-bottom:8px;">
+       🌸
+      </div>
+      <h1 id="loginTitle" style="font-family:'Caveat',cursive;font-size:32px;color:var(--text-primary);margin:0;">Safe Space</h1>
+      <p id="loginWelcome" style="color:var(--text-secondary);font-size:14px;margin-top:4px;">ยินดีต้อนรับสู่ Safe Space</p>
+     </div>
+     <div style="display:flex;flex-direction:column;gap:14px;">
+      <div><label for="loginUser" style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;display:block;">ชื่อผู้ใช้หรือ Email</label> <input id="loginUser" type="text" class="input-field" placeholder="ใส่ชื่อผู้ใช้หรือ Email">
+       <div id="loginUserError" class="error-text"></div>
+      </div>
+      <div><label for="loginPass" style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;display:block;">รหัสผ่าน</label> <input id="loginPass" type="password" class="input-field" placeholder="ใส่รหัสผ่าน">
+       <div id="loginPassError" class="error-text"></div>
+      </div><button id="loginBtn" class="btn-gradient" style="padding:12px;font-size:16px;margin-top:4px;" onclick="doLogin()">เข้าสู่ระบบ</button>
+      <p style="text-align:center;margin:0;"><a href="#" onclick="event.preventDefault();showToast('ระบบรีเซ็ตรหัสผ่านจะเปิดใช้งานในเร็ว ๆ นี้ 📧')" style="font-size:12px;color:var(--text-secondary);text-decoration:none;">ลืมรหัสผ่าน?</a></p>
+      <p style="text-align:center;margin:0;font-size:13px;color:var(--text-secondary);">ยังไม่มีบัญชี? <a href="#" onclick="event.preventDefault();showPage('signupPage')" style="color:#ec4899;text-decoration:none;font-weight:600;">สร้างบัญชี</a></p>
+     </div>
+    </div>
+   </div><!-- ============ SIGNUP PAGE ============ -->
+   <div id="signupPage" class="page" style="align-items:center;justify-content:center;padding:20px;">
+    <div class="glass-card" style="width:100%;max-width:380px;padding:32px;">
+     <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:40px;margin-bottom:8px;">
+       ✨
+      </div>
+      <h1 style="font-family:'Caveat',cursive;font-size:28px;color:var(--text-primary);margin:0;">สร้างบัญชี</h1>
+     </div>
+     <div style="display:flex;flex-direction:column;gap:14px;">
+      <div><label for="signupUser" style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;display:block;">ชื่อผู้ใช้</label> <input id="signupUser" type="text" class="input-field" placeholder="เลือกชื่อผู้ใช้">
+       <div id="signupUserError" class="error-text"></div>
+      </div>
+      <div><label for="signupEmail" style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;display:block;">Email</label> <input id="signupEmail" type="email" class="input-field" placeholder="ใส่ Email ของคุณ">
+       <div id="signupEmailError" class="error-text"></div>
+      </div>
+      <div><label for="signupPass" style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;display:block;">รหัสผ่าน (อย่างน้อย 6 ตัวอักษร)</label> <input id="signupPass" type="password" class="input-field" placeholder="สร้างรหัสผ่าน">
+       <div id="signupPassError" class="error-text"></div>
+      </div>
+      <div><label for="signupPassConfirm" style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;display:block;">ยืนยันรหัสผ่าน</label> <input id="signupPassConfirm" type="password" class="input-field" placeholder="ยืนยันรหัสผ่าน">
+       <div id="signupPassConfirmError" class="error-text"></div>
+      </div><label style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text-secondary);cursor:pointer;"> <input type="checkbox" id="agreeTerms" style="accent-color:#ec4899;width:16px;height:16px;"> ฉันยอมรับ <a href="#" onclick="event.preventDefault();showToast('เงื่อนไขการใช้งาน 📜')" style="color:#ec4899;text-decoration:none;">เงื่อนไขการใช้งาน</a> </label> <button class="btn-gradient" style="padding:12px;font-size:16px;" onclick="doSignup()">สมัครสมาชิก</button>
+      <p style="text-align:center;margin:0;font-size:13px;color:var(--text-secondary);">มีบัญชีแล้ว? <a href="#" onclick="event.preventDefault();showPage('loginPage')" style="color:#ec4899;text-decoration:none;font-weight:600;">เข้าสู่ระบบ</a></p>
+     </div>
+    </div>
+   </div><!-- ============ MAIN APP (after login) ============ -->
+   <div id="mainApp" class="page" style="height:100%;">
+    <div style="flex:1;overflow-y:auto;overflow-x:hidden;" id="mainScroll"><!-- HOME VIEW -->
+     <div id="homeView" class="app-view" style="padding:16px;display:block;">
+      <header style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+       <h2 style="font-family:'Caveat',cursive;font-size:26px;color:var(--text-primary);margin:0;">หน้าแรก</h2>
+       <div class="profile-avatar" id="headerAvatar" onclick="showProfileModal()">
+        <span id="avatarEmoji">😊</span>
+       </div>
+      </header><!-- Banner -->
+      <div class="banner-container" id="bannerContainer">
+       <div class="banner-track" id="bannerTrack">
+        <div class="banner-slide">
+         คุณไม่ได้อยู่คนเดียว 💕
+        </div>
+        <div class="banner-slide">
+         ทุกสายฝนจะหยุดตกในที่สุด 🌈
+        </div>
+        <div class="banner-slide">
+         กรุณารักษาตัวดีวันนี้ 🌸
+        </div>
+        <div class="banner-slide">
+         คุณสำคัญมากขึ้นกว่าที่คิด ⭐
+        </div>
+        <div class="banner-slide">
+         ใจเย็นๆ ทีละวัน 🦋
+        </div>
+       </div>
+      </div><!-- Features -->
+      <div style="margin-top:20px;display:flex;flex-direction:column;gap:14px;">
+       <div class="feature-card" onclick="openChatAI()">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+         <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#f9a8d4,#c4b5fd);display:flex;align-items:center;justify-content:center;font-size:22px;">
+          🤖
+         </div>
+         <div>
+          <h3 style="margin:0;font-size:16px;color:var(--text-primary);font-weight:700;">แชทกับ AI</h3>
+          <p style="margin:0;font-size:12px;color:var(--text-secondary);">คุยกับที่ปรึกษา AI ตลอดเวลา</p>
+         </div>
+        </div><button class="btn-gradient" style="width:100%;padding:10px;font-size:14px;" onclick="event.stopPropagation();openChatAI()">แชทเลย</button>
+       </div>
+       <div class="feature-card" onclick="openExpertChat()">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+         <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#93c5fd,#f9a8d4);display:flex;align-items:center;justify-content:center;font-size:22px;">
+          👩‍⚕️
+         </div>
+         <div>
+          <h3 style="margin:0;font-size:16px;color:var(--text-primary);font-weight:700;">แชทกับผู้เชี่ยวชาญ</h3>
+          <p style="margin:0;font-size:12px;color:var(--text-secondary);">คุยกับผู้เชี่ยวชาญจริงคนนึง</p>
+         </div>
+        </div><button class="btn-gradient" style="width:100%;padding:10px;font-size:14px;" onclick="event.stopPropagation();openExpertChat()">แชทเลย</button>
+       </div>
+       <div class="feature-card" onclick="openCommunity()">
+        <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+         <div style="width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,#c4b5fd,#93c5fd);display:flex;align-items:center;justify-content:center;font-size:22px;">
+          👥
+         </div>
+         <div>
+          <h3 style="margin:0;font-size:16px;color:var(--text-primary);font-weight:700;">กลุ่มชุมชน</h3>
+          <p style="margin:0;font-size:12px;color:var(--text-secondary);">เข้ากลุ่มแชท แบ่งปันประสบการณ์</p>
+         </div>
+        </div><button class="btn-gradient" style="width:100%;padding:10px;font-size:14px;" onclick="event.stopPropagation();openCommunity()">แชทเลย</button>
+       </div>
+      </div>
+      <div style="height:20px;"></div>
+     </div><!-- CHAT AI VIEW -->
+     <div id="chatAIView" class="app-view" style="display:none;height:100%;flex-direction:column;">
+      <header style="display:flex;align-items:center;gap:12px;padding:16px;background:rgba(255,255,255,0.6);backdrop-filter:blur(10px);"><button onclick="goHome()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-primary);">←</button>
+       <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#f9a8d4,#c4b5fd);display:flex;align-items:center;justify-content:center;font-size:18px;">
+        🤖
+       </div>
+       <div>
+        <h3 style="margin:0;font-size:16px;color:var(--text-primary);">ที่ปรึกษา AI</h3>
+        <p style="margin:0;font-size:11px;color:var(--text-secondary);">พร้อมที่จะฟังเสมอ</p>
+       </div>
+      </header>
+      <div id="aiChatMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;">
+       <div class="chat-bubble received">
+        สวัสดีค่ะ 🌸 ฉันคือที่ปรึกษา AI ของคุณ วันนี้คุณรู้สึกเป็นอย่างไรบ้างคะ
+       </div>
+      </div>
+      <div style="padding:12px;display:flex;gap:8px;background:rgba(255,255,255,0.6);backdrop-filter:blur(10px);"><label for="aiChatInput" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;">ข้อความ</label> <input id="aiChatInput" type="text" class="input-field" placeholder="พิมพ์ข้อความของคุณ..." style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault();sendAIChat();}"> <button onclick="sendAIChat()" class="btn-gradient" style="padding:10px 16px;font-size:14px;">ส่ง</button>
+      </div>
+     </div><!-- EXPERT CHAT VIEW -->
+     <div id="expertChatView" class="app-view" style="display:none;height:100%;flex-direction:column;">
+      <header style="display:flex;align-items:center;gap:12px;padding:16px;background:rgba(255,255,255,0.6);backdrop-filter:blur(10px);"><button onclick="goHome()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-primary);">←</button>
+       <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#93c5fd,#f9a8d4);display:flex;align-items:center;justify-content:center;font-size:18px;">
+        👩‍⚕️
+       </div>
+       <div>
+        <h3 style="margin:0;font-size:16px;color:var(--text-primary);">แชทผู้เชี่ยวชาญ</h3>
+        <p style="margin:0;font-size:11px;color:var(--text-secondary);">คุยกับคนจริง</p>
+       </div>
+      </header>
+      <div id="expertChatMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;">
+       <div class="chat-bubble received">
+        สวัสดีค่ะ 💙 ฉันเป็นผู้เชี่ยวชาญด้านสุขภาพจิต พร้อมช่วยเหลือคุณ
+       </div>
+      </div>
+      <div style="padding:12px;display:flex;gap:8px;background:rgba(255,255,255,0.6);backdrop-filter:blur(10px);"><label for="expertChatInput" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;">ข้อความ</label> <input id="expertChatInput" type="text" class="input-field" placeholder="พิมพ์ข้อความของคุณ..." style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault();sendExpertChat();}"> <button onclick="sendExpertChat()" class="btn-gradient" style="padding:10px 16px;font-size:14px;">ส่ง</button>
+      </div>
+     </div><!-- COMMUNITY VIEW -->
+     <div id="communityView" class="app-view" style="display:none;padding:16px;">
+      <header style="display:flex;align-items:center;gap:12px;margin-bottom:16px;"><button onclick="goHome()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-primary);">←</button>
+       <h2 style="font-family:'Caveat',cursive;font-size:24px;color:var(--text-primary);margin:0;">กลุ่มชุมชน</h2>
+      </header>
+      <div id="communityRooms" style="display:flex;flex-direction:column;gap:10px;"></div>
+      <div style="margin-top:16px;"><label for="newRoomName" style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;display:block;">สร้างห้องใหม่</label>
+       <div style="display:flex;gap:8px;"><input id="newRoomName" type="text" class="input-field" placeholder="ชื่อห้อง..." style="flex:1;"> <button onclick="createRoom()" class="btn-gradient" style="padding:10px 16px;font-size:14px;">สร้าง</button>
+       </div>
+      </div>
+     </div><!-- COMMUNITY CHAT VIEW -->
+     <div id="communityChatView" class="app-view" style="display:none;height:100%;flex-direction:column;">
+      <header style="display:flex;align-items:center;gap:12px;padding:16px;background:rgba(255,255,255,0.6);backdrop-filter:blur(10px);"><button onclick="openCommunity()" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-primary);">←</button>
+       <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#c4b5fd,#93c5fd);display:flex;align-items:center;justify-content:center;font-size:18px;">
+        👥
+       </div>
+       <div>
+        <h3 id="commRoomTitle" style="margin:0;font-size:16px;color:var(--text-primary);">ห้อง</h3>
+       </div>
+      </header>
+      <div id="commChatMessages" style="flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;"></div>
+      <div style="padding:12px;display:flex;gap:8px;background:rgba(255,255,255,0.6);backdrop-filter:blur(10px);"><label for="commChatInput" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;">ข้อความ</label> <input id="commChatInput" type="text" class="input-field" placeholder="พิมพ์ข้อความของคุณ..." style="flex:1;" onkeydown="if(event.key==='Enter'){event.preventDefault();sendCommChat();}"> <button onclick="sendCommChat()" class="btn-gradient" style="padding:10px 16px;font-size:14px;">ส่ง</button>
+      </div>
+     </div><!-- COZY SPACE VIEW (Posts/Feed) -->
+     <div id="cozyView" class="app-view" style="display:none;padding:16px;">
+      <header style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+       <h2 style="font-family:'Caveat',cursive;font-size:24px;color:var(--text-primary);margin:0;">🤍 มุมสบายใจ</h2>
+      </header>
+      <div style="margin-bottom:14px;"><label for="postInput" style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;display:block;">แชร์สิ่งที่อยู่ในใจ</label> <textarea id="postInput" class="input-field" rows="3" placeholder="คุณคิดอะไรอยู่ 💭" style="resize:none;font-family:'Quicksand','Noto Sans Thai',sans-serif;"></textarea> <button onclick="createPost()" class="btn-gradient" style="width:100%;padding:10px;font-size:14px;margin-top:8px;">โพสต์ ✨</button>
+      </div>
+      <div id="postsFeed" style="display:flex;flex-direction:column;gap:10px;"></div>
+     </div><!-- NOTIFICATIONS VIEW -->
+     <div id="notiView" class="app-view" style="display:none;padding:16px;">
+      <header style="margin-bottom:16px;">
+       <h2 style="font-family:'Caveat',cursive;font-size:24px;color:var(--text-primary);margin:0;">🔔 การแจ้งเตือน</h2>
+      </header>
+      <div id="notificationsList" style="display:flex;flex-direction:column;gap:8px;">
+       <p style="text-align:center;color:var(--text-secondary);font-size:14px;padding:40px 0;">ยังไม่มีการแจ้งเตือน 🌙</p>
+      </div>
+     </div><!-- MESSAGES VIEW -->
+     <div id="messagesView" class="app-view" style="display:none;padding:16px;">
+      <header style="margin-bottom:16px;">
+       <h2 style="font-family:'Caveat',cursive;font-size:24px;color:var(--text-primary);margin:0;">💬 ข้อความ</h2>
+      </header>
+      <div id="messagesList" style="display:flex;flex-direction:column;gap:10px;"></div>
+     </div><!-- PROFILE / SETTINGS VIEW -->
+     <div id="profileView" class="app-view" style="display:none;padding:16px;">
+      <header style="margin-bottom:16px;">
+       <h2 style="font-family:'Caveat',cursive;font-size:24px;color:var(--text-primary);margin:0;">👤 โปรไฟล์และการตั้งค่า</h2>
+      </header>
+      <div class="glass-card" style="padding:20px;margin-bottom:16px;text-align:center;">
+       <div style="width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,#f9a8d4,#93c5fd);display:flex;align-items:center;justify-content:center;font-size:32px;margin:0 auto 12px;" id="profileBigAvatar">
+        😊
+       </div>
+       <h3 id="profileDisplayName" style="margin:0;color:var(--text-primary);font-size:18px;">ผู้ใช้</h3>
+       <p id="profileDisplayEmail" style="margin:4px 0 0;color:var(--text-secondary);font-size:13px;">user@email.com</p>
+      </div><!-- Sentiment Analysis -->
+      <div class="feature-card" style="margin-bottom:14px;cursor:default;">
+       <h3 style="margin:0 0 12px;font-size:16px;color:var(--text-primary);font-weight:700;">📊 การวิเคราะห์อารมณ์</h3>
+       <div id="sentimentChart" style="margin-bottom:12px;">
+        <div style="display:flex;flex-direction:column;gap:8px;" id="sentimentBars">
+         <p style="text-align:center;color:var(--text-secondary);font-size:13px;">ทำแบบทดสอบเพื่อดูผลลัพธ์!</p>
+        </div>
+       </div><button onclick="startQuiz()" class="btn-gradient" style="width:100%;padding:10px;font-size:14px;">ทำแบบทดสอบ 🧠</button>
+      </div><!-- Expert Registration -->
+      <div class="feature-card" style="margin-bottom:14px;">
+       <h3 style="margin:0 0 8px;font-size:16px;color:var(--text-primary);font-weight:700;">💼 สมัครเป็นผู้เชี่ยวชาญ</h3>
+       <p style="margin:0 0 12px;font-size:13px;color:var(--text-secondary);">คุณสามารถช่วยเหลือคนอื่นได้</p>
+       <div id="expertStatus" style="display:flex;gap:8px;"></div>
+      </div><!-- Logout Button -->
+      <div style="margin-bottom:14px;"><button onclick="doLogout()" style="width:100%;padding:12px;border:2px solid rgba(249,168,212,0.4);border-radius:14px;background:transparent;color:var(--text-primary);font-family:'Quicksand','Noto Sans Thai',sans-serif;font-size:14px;font-weight:600;cursor:pointer;">ออกจากระบบ</button>
+      </div>
+     </div><!-- QUIZ VIEW -->
+     <div id="quizView" class="app-view" style="display:none;padding:16px;">
+      <header style="display:flex;align-items:center;gap:12px;margin-bottom:16px;"><button onclick="showAppView('profileView');switchNav('navProfile')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text-primary);">←</button>
+       <h2 style="font-family:'Caveat',cursive;font-size:24px;color:var(--text-primary);margin:0;">แบบทดสอบสุขภาพจิต 🧠</h2>
+      </header>
+      <div id="quizContent"></div>
+     </div>
+    </div><!-- BOTTOM NAV -->
+    <nav class="bottom-nav" id="bottomNav" aria-label="เมนูหลัก">
+     <div class="nav-item active" id="navCozy" onclick="switchNav('navCozy');showAppView('cozyView')">
+      <svg viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+       <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+      </svg><span>สบายใจ</span>
+     </div>
+     <div class="nav-item" id="navNoti" onclick="switchNav('navNoti');showAppView('notiView')">
+      <svg viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+       <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" /><path d="M13.73 21a2 2 0 0 1-3.46 0" />
+      </svg><span>แจ้งเตือน</span>
+     </div>
+     <div class="nav-item" id="navHome" onclick="switchNav('navHome');showAppView('homeView')">
+      <svg viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+       <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" />
+      </svg><span>หน้าแรก</span>
+     </div>
+     <div class="nav-item" id="navMsg" onclick="switchNav('navMsg');showAppView('messagesView')">
+      <svg viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+       <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+      </svg><span>แชท</span>
+     </div>
+     <div class="nav-item" id="navProfile" onclick="switchNav('navProfile');showAppView('profileView')">
+      <svg viewbox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
+      </svg><span>โปรไฟล์</span>
+     </div>
+    </nav>
+   </div><!-- Profile Modal -->
+   <div id="profileModal" style="display:none;"></div><!-- Toast -->
+   <div id="toastContainer"></div>
+  </div>
+  <script>
+// ==================== STATE ====================
+let currentUser = { username: 'ผู้ใช้', email: 'user@email.com', emoji: '😊', isExpert: false };
+let allData = [];
+let registeredUsers = [];
+let currentCommunityRoom = null;
+let bannerIndex = 0;
+let bannerInterval = null;
+
+const defaultConfig = {
+  app_title: 'Safe Space',
+  welcome_text: 'ยินดีต้อนรับสู่ Safe Space',
+  banner_text_1: 'คุณไม่ได้อยู่คนเดียว 💕',
+  banner_text_2: 'ทุกสายฝนจะหยุดตกในที่สุด 🌈',
+  background_color: '#fce4f2',
+  surface_color: '#ffffff',
+  text_color: '#4a3560',
+  accent_color: '#f9a8d4',
+  secondary_color: '#93c5fd',
+  font_family: 'Quicksand',
+  font_size: 16
+};
+
+// ==================== ELEMENT SDK ====================
+if (window.elementSdk) {
+  window.elementSdk.init({
+    defaultConfig,
+    onConfigChange: async (config) => {
+      const bg = config.background_color || defaultConfig.background_color;
+      const surface = config.surface_color || defaultConfig.surface_color;
+      const text = config.text_color || defaultConfig.text_color;
+      const accent = config.accent_color || defaultConfig.accent_color;
+      const secondary = config.secondary_color || defaultConfig.secondary_color;
+      const font = config.font_family || defaultConfig.font_family;
+      const fontSize = config.font_size || defaultConfig.font_size;
+
+      document.documentElement.style.setProperty('--bg-gradient-1', bg);
+      document.documentElement.style.setProperty('--text-primary', text);
+      document.documentElement.style.setProperty('--accent-pink', accent);
+      document.documentElement.style.setProperty('--accent-blue', secondary);
+      document.documentElement.style.setProperty('--card-bg', surface);
+
+      document.body.style.fontFamily = `${font}, Quicksand, 'Noto Sans Thai', sans-serif`;
+      document.body.style.fontSize = `${fontSize}px`;
+
+      const title = document.getElementById('loginTitle');
+      if (title) title.textContent = config.app_title || defaultConfig.app_title;
+      const welcome = document.getElementById('loginWelcome');
+      if (welcome) welcome.textContent = config.welcome_text || defaultConfig.welcome_text;
+
+      const slides = document.querySelectorAll('.banner-slide');
+      if (slides[0]) slides[0].textContent = config.banner_text_1 || defaultConfig.banner_text_1;
+      if (slides[1]) slides[1].textContent = config.banner_text_2 || defaultConfig.banner_text_2;
+    },
+    mapToCapabilities: (config) => ({
+      recolorables: [
+        { get: () => config.background_color || defaultConfig.background_color, set: (v) => { config.background_color = v; window.elementSdk.setConfig({ background_color: v }); } },
+        { get: () => config.surface_color || defaultConfig.surface_color, set: (v) => { config.surface_color = v; window.elementSdk.setConfig({ surface_color: v }); } },
+        { get: () => config.text_color || defaultConfig.text_color, set: (v) => { config.text_color = v; window.elementSdk.setConfig({ text_color: v }); } },
+        { get: () => config.accent_color || defaultConfig.accent_color, set: (v) => { config.accent_color = v; window.elementSdk.setConfig({ accent_color: v }); } },
+        { get: () => config.secondary_color || defaultConfig.secondary_color, set: (v) => { config.secondary_color = v; window.elementSdk.setConfig({ secondary_color: v }); } }
+      ],
+      borderables: [],
+      fontEditable: {
+        get: () => config.font_family || defaultConfig.font_family,
+        set: (v) => { config.font_family = v; window.elementSdk.setConfig({ font_family: v }); }
+      },
+      fontSizeable: {
+        get: () => config.font_size || defaultConfig.font_size,
+        set: (v) => { config.font_size = v; window.elementSdk.setConfig({ font_size: v }); }
+      }
+    }),
+    mapToEditPanelValues: (config) => new Map([
+      ['app_title', config.app_title || defaultConfig.app_title],
+      ['welcome_text', config.welcome_text || defaultConfig.welcome_text],
+      ['banner_text_1', config.banner_text_1 || defaultConfig.banner_text_1],
+      ['banner_text_2', config.banner_text_2 || defaultConfig.banner_text_2]
+    ])
+  });
+}
+
+// ==================== DATA SDK ====================
+const dataHandler = {
+  onDataChanged(data) {
+    allData = data;
+    registeredUsers = data.filter(d => d.type === 'user_account');
+    renderPosts();
+    renderCommunityRooms();
+    renderMessages();
+    renderNotifications();
+    if (currentCommunityRoom) renderCommChat();
+    renderSentiment();
+    renderExpertStatus();
+  }
+};
+
+(async () => {
+  if (window.dataSdk) {
+    const r = await window.dataSdk.init(dataHandler);
+    if (!r.isOk) console.error('Data SDK init failed');
+  }
+})();
+
+// ==================== NAVIGATION ====================
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById(pageId).classList.add('active');
+  clearErrors();
+}
+
+function showAppView(viewId) {
+  document.querySelectorAll('.app-view').forEach(v => v.style.display = 'none');
+  const view = document.getElementById(viewId);
+  if (view) {
+    const isChatView = ['chatAIView','expertChatView','communityChatView'].includes(viewId);
+    view.style.display = isChatView ? 'flex' : 'block';
+  }
+  document.getElementById('mainScroll').scrollTop = 0;
+}
+
+function switchNav(navId) {
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById(navId).classList.add('active');
+}
+
+function goHome() {
+  showAppView('homeView');
+  switchNav('navHome');
+}
+
+// ==================== ERROR HANDLING ====================
+function clearErrors() {
+  document.querySelectorAll('.error-text').forEach(e => e.textContent = '');
+}
+
+function showError(elementId, message) {
+  const el = document.getElementById(elementId);
+  if (el) el.textContent = message;
+}
+
+// ==================== HASH PASSWORD SIMULATION ====================
+function simpleHash(str) {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash = hash & hash;
+  }
+  return Math.abs(hash).toString(16);
+}
+
+// ==================== AUTH ====================
+function validateEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function validatePassword(pass) {
+  return pass.length >= 6;
+}
+
+async function doLogin() {
+  clearErrors();
+  const userInput = document.getElementById('loginUser').value.trim();
+  const password = document.getElementById('loginPass').value.trim();
+
+  if (!userInput) { showError('loginUserError', 'โปรดใส่ชื่อผู้ใช้หรือ Email'); return; }
+  if (!password) { showError('loginPassError', 'โปรดใส่รหัสผ่าน'); return; }
+
+  const user = registeredUsers.find(u => u.username === userInput || u.email === userInput);
+  if (!user) { showError('loginUserError', 'ไม่พบบัญชีนี้'); return; }
+
+  const passwordHash = simpleHash(password);
+  if (user.password_hash !== passwordHash) {
+    showError('loginPassError', 'รหัสผ่านไม่ถูกต้อง');
+    if (window.dataSdk) {
+      const loginAttempts = (user.login_attempts || 0) + 1;
+      await window.dataSdk.update({ ...user, login_attempts: loginAttempts });
+    }
+    return;
+  }
+
+  currentUser.username = user.username;
+  currentUser.email = user.email;
+  currentUser.emoji = user.profile_emoji || '😊';
+  currentUser.isExpert = user.expert_status === 'approved';
+  updateProfileDisplay();
+
+  if (window.dataSdk) {
+    await window.dataSdk.update({ ...user, last_login: new Date().toISOString(), login_attempts: 0 });
+  }
+
+  showPage('mainApp');
+  showAppView('homeView');
+  switchNav('navHome');
+  startBanner();
+  showToast('ยินดีต้อนรับกลับมา! 🌸');
+}
+
+async function doSignup() {
+  clearErrors();
+  const username = document.getElementById('signupUser').value.trim();
+  const email = document.getElementById('signupEmail').value.trim();
+  const password = document.getElementById('signupPass').value.trim();
+  const passConfirm = document.getElementById('signupPassConfirm').value.trim();
+  const agree = document.getElementById('agreeTerms').checked;
+
+  if (!username) { showError('signupUserError', 'โปรดใส่ชื่อผู้ใช้'); return; }
+  if (username.length < 3) { showError('signupUserError', 'ชื่อผู้ใช้ต้องมีอย่างน้อย 3 ตัวอักษร'); return; }
+  if (registeredUsers.some(u => u.username === username)) { showError('signupUserError', 'ชื่อผู้ใช้นี้ถูกใช้แล้ว'); return; }
+
+  if (!email) { showError('signupEmailError', 'โปรดใส่ Email'); return; }
+  if (!validateEmail(email)) { showError('signupEmailError', 'Email ไม่ถูกต้อง'); return; }
+  if (registeredUsers.some(u => u.email === email)) { showError('signupEmailError', 'Email นี้ถูกใช้แล้ว'); return; }
+
+  if (!password) { showError('signupPassError', 'โปรดใส่รหัสผ่าน'); return; }
+  if (!validatePassword(password)) { showError('signupPassError', 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร'); return; }
+
+  if (password !== passConfirm) { showError('signupPassConfirmError', 'รหัสผ่านไม่ตรงกัน'); return; }
+  if (!agree) { showError('signupUserError', 'โปรดอ่านและยอมรับเงื่อนไข'); return; }
+
+  if (window.dataSdk) {
+    const passwordHash = simpleHash(password);
+    const result = await window.dataSdk.create({
+      type: 'user_account',
+      username, email, password_hash: passwordHash,
+      profile_emoji: '😊',
+      expert_status: 'none',
+      login_attempts: 0,
+      timestamp: new Date().toISOString()
+    });
+
+    if (result.isOk) {
+      currentUser.username = username;
+      currentUser.email = email;
+      currentUser.emoji = '😊';
+      currentUser.isExpert = false;
+      updateProfileDisplay();
+      showPage('mainApp');
+      showAppView('homeView');
+      switchNav('navHome');
+      startBanner();
+      showToast('สร้างบัญชีเรียบร้อย! ✨');
+    } else {
+      showError('signupUserError', 'เกิดข้อผิดพลาด โปรดลองใหม่');
+    }
+  }
+}
+
+function doLogout() {
+  currentUser.isExpert = false;
+  showPage('loginPage');
+  document.getElementById('loginUser').value = '';
+  document.getElementById('loginPass').value = '';
+  clearErrors();
+  if (bannerInterval) clearInterval(bannerInterval);
+}
+
+function updateProfileDisplay() {
+  document.getElementById('avatarEmoji').textContent = currentUser.emoji;
+  document.getElementById('profileBigAvatar').textContent = currentUser.emoji;
+  document.getElementById('profileDisplayName').textContent = currentUser.username;
+  document.getElementById('profileDisplayEmail').textContent = currentUser.email;
+}
+
+// ==================== PROFILE MODAL ====================
+function showProfileModal() {
+  const modal = document.getElementById('profileModal');
+  const emojis = ['😊','😎','🥰','🤗','🦄','🌸','🌈','⭐','💙','🐱','🐻','🌺'];
+  modal.innerHTML = `
+    <div class="modal-overlay" onclick="if(event.target===this)closeProfileModal()">
+      <div class="glass-card" style="width:90%;max-width:340px;padding:24px;">
+        <h3 style="margin:0 0 16px;text-align:center;font-family:'Caveat',cursive;font-size:22px;color:var(--text-primary);">แก้ไขโปรไฟล์</h3>
+        <div style="margin-bottom:14px;">
+          <label for="editName" style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:4px;">ชื่อผู้ใช้</label>
+          <input id="editName" type="text" class="input-field" value="${currentUser.username}" disabled style="opacity:0.6;cursor:not-allowed;">
+          <p style="font-size:11px;color:var(--text-secondary);margin:4px 0 0;">ไม่สามารถแก้ไขชื่อผู้ใช้</p>
+        </div>
+        <div style="margin-bottom:14px;">
+          <label style="font-size:12px;color:var(--text-secondary);display:block;margin-bottom:8px;">เลือกสัญลักษณ์</label>
+          <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;">
+            ${emojis.map(e => `<div onclick="selectEmoji('${e}')" style="width:40px;height:40px;border-radius:50%;background:${e===currentUser.emoji?'linear-gradient(135deg,#f9a8d4,#93c5fd)':'rgba(196,181,253,0.2)'};display:flex;align-items:center;justify-content:center;font-size:20px;cursor:pointer;transition:all 0.2s;" class="emoji-pick">${e}</div>`).join('')}
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="closeProfileModal()" style="flex:1;padding:10px;border:2px solid rgba(196,181,253,0.3);border-radius:12px;background:transparent;font-family:'Quicksand','Noto Sans Thai',sans-serif;cursor:pointer;color:var(--text-primary);">ยกเลิก</button>
+          <button onclick="saveProfile()" class="btn-gradient" style="flex:1;padding:10px;font-size:14px;">บันทึก</button>
+        </div>
+      </div>
+    </div>`;
+  modal.style.display = 'block';
+}
+
+function selectEmoji(e) {
+  currentUser.emoji = e;
+  document.querySelectorAll('.emoji-pick').forEach(el => {
+    el.style.background = el.textContent === e ? 'linear-gradient(135deg,#f9a8d4,#93c5fd)' : 'rgba(196,181,253,0.2)';
+  });
+}
+
+function closeProfileModal() { document.getElementById('profileModal').style.display = 'none'; }
+
+async function saveProfile() {
+  const user = registeredUsers.find(u => u.username === currentUser.username);
+  if (user && window.dataSdk) {
+    await window.dataSdk.update({ ...user, profile_emoji: currentUser.emoji });
+  }
+  updateProfileDisplay();
+  closeProfileModal();
+  showToast('อัปเดตโปรไฟล์เรียบร้อย! 🌟');
+}
+
+// ==================== BANNER ====================
+function startBanner() {
+  const slides = document.querySelectorAll('.banner-slide');
+  if (slides.length === 0) return;
+  bannerIndex = 0;
+  if (bannerInterval) clearInterval(bannerInterval);
+  bannerInterval = setInterval(() => {
+    bannerIndex = (bannerIndex + 1) % slides.length;
+    document.getElementById('bannerTrack').style.transform = `translateX(-${bannerIndex * 100}%)`;
+  }, 3500);
+}
+
+// ==================== TOAST ====================
+function showToast(msg) {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = 'toast';
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s'; setTimeout(() => t.remove(), 300); }, 2500);
+}
+
+// ==================== AI RESPONSES (More Natural & Varied) ====================
+const aiResponses = [
+  "ฉันรู้ว่าคุณสึกอย่างไร ความรู้สึกของคุณนั้นสมควรได้รับการยอมรับ คุณสามารถบอกฉันเพิ่มเติมเกี่ยวกับเรื่องนี้ได้ไหมคะ",
+  "ฟังดูยากจริงๆ อย่าลืมว่ามันโอเคนะที่จะไม่โอเค บางครั้งมีวันที่หนักใจกว่า บางครั้งเราแค่ต้องนอนหลับและพยายามใหม่",
+  "ขอบคุณที่ไว้วางใจบอกให้ฉันฟัง คุณกำลังแสดงความกล้าหาญ ลองหายใจลึกๆดูบ้างไหมคะ นั่งสบาย ๆ แล้วคิดถึงสิ่งที่ทำให้คุณรู้สึกปลอดภัย",
+  "ฉันเข้าใจค่ะ บางครั้งจิตใจเราจึงรู้สึกท่วมท้น ลองทำการออกกำลังกายเบาๆหรือพยายามแตะผิวสิ่งของรอบตัว เดินเล่น ฟังเพลง หรือแค่นั่งเงียบ ๆ",
+  "คุณไม่ได้อยู่คนเดียวค่ะ มีหลายคนที่ประสบความรู้สึกแบบนี้ เรื่องเล็กๆอะไรช่วยให้คุณยิ้มได้บ้าง? เราค้นหาเรื่องสุข ๆ ด้วยกันนะคะ",
+  "ฉันชื่นชมที่คุณไว้วางใจเปิดใจ ความเมตตากับตัวเองนั้นสำคัญมากค่ะ คุณจะพูดอะไรกับเพื่อนที่ประสบเหมือนกันนี้ได้บ้าง?",
+  "มันต้องยากขนาดนั้นค่ะ ฉันรู้สึกเสียใจ มาตั้งสมาธิกับสิ่งที่เราควบคุมได้กัน คุณจะทำอะไรครั้งต่อไป? มีแผนหรือเป้าหมายนาทีหนึ่งบ้างคะ",
+  "ความรู้สึกของคุณนั้นมีความสำคัญค่ะ คุณนอนหลับพอไหม บ่อยครั้งพื้นฐานเหล่านี้สำคัญมากเลยนะ ดื่มน้ำ นอนพอ กินข้าวปกติ",
+  "ฉันอยู่ที่นี่เสมอค่ะ จำไว้ว่าการรักษาตัวเองไม่ใช่เส้นตรง บางวันจะหนักกว่าบ้าง แต่มันก็โอเคค่ะ ความสำคัญคือคุณยังพยายามอยู่",
+  "ต้องใจกล้านักเลยที่พูดถึงเรื่องเหล่านี้ค่ะ สถานที่ปลอดภัยในใจคุณหน้าตาเป็นยังไง? คนที่คุณไว้วางใจ? สถานที่เงียบ ๆ? บางครั้งเราแค่ต้องการความสงบ",
+  "ดูเหมือนว่าคุณกำลังผ่านช่วงยาก ๆ นะคะ แต่ฉันเห็นว่าคุณพยายามอย่างมากแล้ว นั่นคือเรื่องดีอยู่แล้ว มีอะไรที่ฉันช่วยคุณได้ไหมคะ",
+  "เป็นเรื่องปกติที่จะรู้สึกแบบนี้นะคะ แต่ความสำคัญคือไม่ให้มันกลบนิดด้วยสำนึก หลังจากวันยากๆ มีวันที่ง่ายขึ้นรออยู่เสมอ 🌈",
+  "บางครั้งการทำสิ่งเล็กๆน้อยๆก็ช่วยได้นะคะ เชื่อใจนี่แหละ ครั้งต่อไปเมื่อคุณรู้สึกท่วมท้อ ลองทำสิ่งที่ทำให้คุณรู้สึกดี ถึงแม้จะเป็นแค่สิ่งเล็กๆ"
+];
+
+// ==================== CHAT AI ====================
+function openChatAI() {
+  showAppView('chatAIView');
+  switchNav('navHome');
+}
+
+async function sendAIChat() {
+  const input = document.getElementById('aiChatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  const container = document.getElementById('aiChatMessages');
+  const sentBubble = document.createElement('div');
+  sentBubble.className = 'chat-bubble sent';
+  sentBubble.textContent = msg;
+  container.appendChild(sentBubble);
+  container.scrollTop = container.scrollHeight;
+
+  if (window.dataSdk) {
+    await window.dataSdk.create({
+      type: 'chat_ai',
+      content: msg,
+      sender: currentUser.username,
+      timestamp: new Date().toISOString()
+    });
+  }
+
+  setTimeout(() => {
+    const response = aiResponses[Math.floor(Math.random() * aiResponses.length)];
+    const recBubble = document.createElement('div');
+    recBubble.className = 'chat-bubble received';
+    recBubble.textContent = response;
+    container.appendChild(recBubble);
+    container.scrollTop = container.scrollHeight;
+  }, 800 + Math.random() * 1200);
+}
+
+// ==================== EXPERT CHAT ==================== 
+function openExpertChat() {
+  showAppView('expertChatView');
+  switchNav('navHome');
+}
+
+async function sendExpertChat() {
+  const input = document.getElementById('expertChatInput');
+  const msg = input.value.trim();
+  if (!msg) return;
+  input.value = '';
+  const container = document.getElementById('expertChatMessages');
+  const sentBubble = document.createElement('div');
+  sentBubble.className = 'chat-bubble sent';
+  sentBubble.textContent = msg;
+  container.appendChild(sentBubble);
+  container.scrollTop = container.scrollHeight;
+
+  if (window.dataSdk) {
+    await window.dataSdk.create({
+      type: 'chat_expert',
+      content: msg,
+      sender: currentUser.username,
+      timestamp: new Date().toISOString(),
+      expert_responding: false
+    });
+  }
+
+  const waitingBubble = document.createElement('div');
+  waitingBubble.className = 'chat-bubble waiting';
+  waitingBubble.textContent = 'รอการตอบกลับจากผู้เชี่ยวชาญ...';
+  waitingBubble.id = 'waiting-' + Date.now();
+  container.appendChild(waitingBubble);
+  container.scrollTop = container.scrollHeight;
+}
+
+// ==================== EXPERT REQUEST SYSTEM ====================
+async function toggleExpertStatus() {
+  if (currentUser.isExpert) {
+    currentUser.isExpert = false;
+    const user = registeredUsers.find(u => u.username === currentUser.username);
+    if (user && window.dataSdk) {
+      await window.dataSdk.update({ ...user, expert_status: 'none' });
+    }
+    showToast('หยุดเป็นผู้เชี่ยวชาญแล้ว');
+  } else {
+    if (window.dataSdk) {
+      const result = await window.dataSdk.create({
+        type: 'expert_request',
+        username: currentUser.username,
+        email: currentUser.email,
+        expert_request_status: 'pending',
+        timestamp: new Date().toISOString()
+      });
+      if (result.isOk) {
+        showToast('ส่งการร้องขอแล้ว! รอการอนุมัติจากเจ้าของเว็บ 📋');
+      }
+    }
+  }
+  renderExpertStatus();
+}
+
+function renderExpertStatus() {
+  const container = document.getElementById('expertStatus');
+  if (!container) return;
+
+  if (currentUser.isExpert) {
+    container.innerHTML = `
+      <div style="width:100%;padding:10px 12px;background:rgba(251,191,36,0.1);border-radius:12px;display:flex;align-items:center;gap:10px;font-size:13px;">
+        <span class="expert-badge">✓ ผู้เชี่ยวชาญ</span>
+        <p style="margin:0;color:var(--text-secondary);">คุณสามารถตอบข้อความใน Expert Chat ได้</p>
+      </div>
+      <button onclick="toggleExpertStatus()" style="width:100%;padding:10px;border:2px solid rgba(251,191,36,0.3);border-radius:12px;background:transparent;color:var(--text-primary);font-family:'Quicksand','Noto Sans Thai',sans-serif;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px;">หยุดเป็นผู้เชี่ยวชาญ</button>`;
+  } else {
+    const requested = allData.find(d => d.type === 'expert_request' && d.username === currentUser.username);
+    if (requested && requested.expert_request_status === 'pending') {
+      container.innerHTML = `
+        <div style="width:100%;padding:10px 12px;background:rgba(167,139,250,0.1);border-radius:12px;display:flex;align-items:center;gap:10px;font-size:13px;">
+          <span class="pending-badge">⏳ รออนุมัติ</span>
+          <p style="margin:0;color:var(--text-secondary);">การร้องขอของคุณอยู่ในระหว่างพิจารณา</p>
+        </div>`;
+    } else {
+      container.innerHTML = `<button onclick="toggleExpertStatus()" class="btn-gradient" style="width:100%;padding:10px;font-size:14px;">สมัครเป็นผู้เชี่ยวชาญ</button>`;
+    }
+  }
+}
+
+// ==================== COMMUNITY ====================
+const defaultRooms = [
+  { id: 'healing-hearts', name: '💗 หัวใจแสวงบำรุง', desc: 'ที่ปลอดภัยเพื่อแบ่งปันและรักษาจิตใจ' },
+  { id: 'uni-life', name: '🎓 ชีวิตนักศึกษา', desc: 'สนับสนุนผู้เข้ามหาวิทยาลัย' }
+];
+
+function openCommunity() {
+  showAppView('communityView');
+  switchNav('navHome');
+  renderCommunityRooms();
+}
+
+function renderCommunityRooms() {
+  const container = document.getElementById('communityRooms');
+  if (!container) return;
+  const customRooms = allData.filter(d => d.type === 'community_room');
+  const allRooms = [...defaultRooms, ...customRooms.map(r => ({ id: r.room_id, name: r.room_name, desc: 'ห้องกำหนดเอง' }))];
+
+  container.innerHTML = allRooms.map(room => `
+    <div class="feature-card" onclick="enterCommunityRoom('${room.id}','${(room.name || '').replace(/'/g, "\\'")}')">
+      <div style="display:flex;justify-content:space-between;align-items:center;">
+        <div>
+          <h3 style="margin:0;font-size:15px;color:var(--text-primary);">${room.name}</h3>
+          <p style="margin:2px 0 0;font-size:12px;color:var(--text-secondary);">${room.desc || ''}</p>
+        </div>
+        <span style="font-size:18px;">→</span>
+      </div>
+    </div>
+  `).join('');
+}
+
+async function createRoom() {
+  const input = document.getElementById('newRoomName');
+  const name = input.value.trim();
+  if (!name) { showToast('โปรดใส่ชื่อห้อง 📝'); return; }
+  if (allData.filter(d => d.type === 'community_room').length >= 20) {
+    showToast('ถึงขีดจำกัดห้องแล้ว! 🚫'); return;
+  }
+  input.value = '';
+  if (window.dataSdk) {
+    const result = await window.dataSdk.create({
+      type: 'community_room',
+      room_id: 'room-' + Date.now(),
+      room_name: name,
+      timestamp: new Date().toISOString()
+    });
+    if (result.isOk) showToast('สร้างห้องเรียบร้อย! 🎉');
+    else showToast('สร้างห้องไม่สำเร็จ 😔');
+  }
+}
+
+function enterCommunityRoom(roomId, roomName) {
+  currentCommunityRoom = roomId;
+  document.getElementById('commRoomTitle').textContent = roomName;
+  showAppView('communityChatView');
+  renderCommChat();
+}
+
+function renderCommChat() {
+  const container = document.getElementById('commChatMessages');
+  if (!container || !currentCommunityRoom) return;
+  const messages = allData.filter(d => d.type === 'comm_msg' && d.room_id === currentCommunityRoom)
+    .sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+  container.innerHTML = messages.length === 0
+    ? '<p style="text-align:center;color:var(--text-secondary);font-size:13px;padding:20px;">ยังไม่มีข้อความ เริ่มการสนทนากัน! 💬</p>'
+    : messages.map(m => `
+      <div class="chat-bubble ${m.sender === currentUser.username ? 'sent' : 'received'}">
+        <div style="font-size:11px;font-weight:600;margin-bottom:2px;opacity:0.7;">${m.sender}</div>
+        ${m.content}
+      </div>`).join('');
+  container.scrollTop = container.scrollHeight;
+}
+
+async function sendCommChat() {
+  const input = document.getElementById('commChatInput');
+  const msg = input.value.trim();
+  if (!msg || !currentCommunityRoom) return;
+  input.value = '';
+  if (window.dataSdk) {
+    const result = await window.dataSdk.create({
+      type: 'comm_msg',
+      room_id: currentCommunityRoom,
+      content: msg,
+      sender: currentUser.username,
+      timestamp: new Date().toISOString()
+    });
+    if (!result.isOk) showToast('ส่งไม่สำเร็จ 😔');
+  }
+}
+
+// ==================== COZY SPACE (Posts) ====================
+async function createPost() {
+  const input = document.getElementById('postInput');
+  const content = input.value.trim();
+  if (!content) { showToast('เขียนบางอย่างก่อน! ✍️'); return; }
+  input.value = '';
+  if (window.dataSdk) {
+    const result = await window.dataSdk.create({
+      type: 'post',
+      content,
+      sender: currentUser.username,
+      likes: 0,
+      liked_by: '',
+      timestamp: new Date().toISOString(),
+      profile_emoji: currentUser.emoji
+    });
+    if (result.isOk) showToast('โพสต์แล้ว! 🌸');
+    else showToast('โพสต์ไม่สำเร็จ 😔');
+  }
+}
+
+function renderPosts() {
+  const container = document.getElementById('postsFeed');
+  if (!container) return;
+  const posts = allData.filter(d => d.type === 'post').sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  const replies = allData.filter(d => d.type === 'reply');
+
+  container.innerHTML = posts.length === 0
+    ? '<p style="text-align:center;color:var(--text-secondary);font-size:14px;padding:30px;">ยังไม่มีโพสต์ บอกเล่าเรื่องราวของคุณ! 💭</p>'
+    : posts.map(post => {
+      const postReplies = replies.filter(r => r.parent_id === post.__backendId).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp));
+      const likedUsers = (post.liked_by || '').split(',').filter(Boolean);
+      const isLiked = likedUsers.includes(currentUser.username);
+      const timeAgo = getTimeAgo(post.timestamp);
+
+      return `<div class="post-card">
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;">
+          <div class="profile-avatar" style="width:34px;height:34px;font-size:16px;">${post.profile_emoji || '😊'}</div>
+          <div>
+            <span style="font-weight:600;font-size:14px;color:var(--text-primary);">${post.sender}</span>
+            <span style="font-size:11px;color:var(--text-secondary);margin-left:8px;">${timeAgo}</span>
+          </div>
+        </div>
+        <p style="margin:0 0 10px;font-size:14px;color:var(--text-primary);line-height:1.5;">${post.content}</p>
+        <div style="display:flex;gap:16px;align-items:center;margin-bottom:8px;">
+          <button onclick="toggleLike('${post.__backendId}')" style="background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:4px;font-size:13px;color:${isLiked?'#ec4899':'var(--text-secondary)'};font-family:'Quicksand','Noto Sans Thai',sans-serif;">
+            ${isLiked ? '❤️' : '🤍'} ${post.likes || 0}
+          </button>
+          <button onclick="toggleReplyBox('${post.__backendId}')" style="background:none;border:none;cursor:pointer;font-size:13px;color:var(--text-secondary);font-family:'Quicksand','Noto Sans Thai',sans-serif;">
+            💬 ${postReplies.length}
+          </button>
+        </div>
+        ${postReplies.map(r => `
+          <div style="margin-left:20px;padding:8px 12px;background:rgba(196,181,253,0.1);border-radius:10px;margin-bottom:6px;">
+            <span style="font-weight:600;font-size:12px;color:var(--text-primary);">${r.sender}</span>
+            <span style="font-size:11px;color:var(--text-secondary);margin-left:6px;">${getTimeAgo(r.timestamp)}</span>
+            <p style="margin:4px 0 0;font-size:13px;color:var(--text-primary);">${r.content}</p>
+          </div>
+        `).join('')}
+        <div id="replyBox-${post.__backendId}" style="display:none;margin-top:8px;">
+          <div style="display:flex;gap:6px;">
+            <label for="replyInput-${post.__backendId}" class="sr-only" style="position:absolute;width:1px;height:1px;overflow:hidden;">ตอบกลับ</label>
+            <input id="replyInput-${post.__backendId}" type="text" class="input-field" placeholder="ตอบกลับ..." style="flex:1;padding:8px 12px;font-size:13px;font-family:'Quicksand','Noto Sans Thai',sans-serif;" onkeydown="if(event.key==='Enter'){event.preventDefault();sendReply('${post.__backendId}');}">
+            <button onclick="sendReply('${post.__backendId}')" class="btn-gradient" style="padding:8px 12px;font-size:12px;">ตอบ</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+}
+
+function toggleReplyBox(postId) {
+  const box = document.getElementById('replyBox-' + postId);
+  if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+}
+
+async function toggleLike(postId) {
+  const post = allData.find(d => d.__backendId === postId);
+  if (!post) return;
+  const likedUsers = (post.liked_by || '').split(',').filter(Boolean);
+  const isLiked = likedUsers.includes(currentUser.username);
+  let newLiked, newCount;
+  if (isLiked) {
+    newLiked = likedUsers.filter(u => u !== currentUser.username).join(',');
+    newCount = Math.max(0, (post.likes || 0) - 1);
+  } else {
+    likedUsers.push(currentUser.username);
+    newLiked = likedUsers.join(',');
+    newCount = (post.likes || 0) + 1;
+    if (post.sender !== currentUser.username && window.dataSdk) {
+      await window.dataSdk.create({
+        type: 'notification',
+        content: `${currentUser.username} ถูกใจโพสต์ของคุณ ❤️`,
+        sender: currentUser.username,
+        parent_id: postId,
+        timestamp: new Date().toISOString()
+      });
+    }
+  }
+  if (window.dataSdk) {
+    await window.dataSdk.update({ ...post, likes: newCount, liked_by: newLiked });
+  }
+}
+
+async function sendReply(postId) {
+  const input = document.getElementById('replyInput-' + postId);
+  const content = input.value.trim();
+  if (!content) return;
+  input.value = '';
+  if (window.dataSdk) {
+    const result = await window.dataSdk.create({
+      type: 'reply',
+      parent_id: postId,
+      content,
+      sender: currentUser.username,
+      timestamp: new Date().toISOString()
+    });
+    if (result.isOk) {
+      const post = allData.find(d => d.__backendId === postId);
+      if (post && post.sender !== currentUser.username) {
+        await window.dataSdk.create({
+          type: 'notification',
+          content: `${currentUser.username} ตอบกลับโพสต์ของคุณ 💬`,
+          sender: currentUser.username,
+          parent_id: postId,
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
+  }
+}
+
+// ==================== NOTIFICATIONS ====================
+function renderNotifications() {
+  const container = document.getElementById('notificationsList');
+  if (!container) return;
+  const notis = allData.filter(d => d.type === 'notification').sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+  container.innerHTML = notis.length === 0
+    ? '<p style="text-align:center;color:var(--text-secondary);font-size:14px;padding:40px 0;">ยังไม่มีการแจ้งเตือน 🌙</p>'
+    : notis.map(n => `
+      <div class="post-card" style="padding:12px;">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="width:8px;height:8px;border-radius:50%;background:#ec4899;flex-shrink:0;"></div>
+          <div>
+            <p style="margin:0;font-size:14px;color:var(--text-primary);">${n.content}</p>
+            <span style="font-size:11px;color:var(--text-secondary);">${getTimeAgo(n.timestamp)}</span>
+          </div>
+        </div>
+      </div>`).join('');
+}
+
+// ==================== MESSAGES ====================
+function renderMessages() {
+  const container = document.getElementById('messagesList');
+  if (!container) return;
+  const aiChats = allData.filter(d => d.type === 'chat_ai');
+  const expertChats = allData.filter(d => d.type === 'chat_expert');
+  const rooms = [];
+
+  if (aiChats.length > 0) rooms.push({ name: '🤖 ที่ปรึกษา AI', lastMsg: aiChats[aiChats.length - 1]?.content || '', action: 'openChatAI()' });
+  if (expertChats.length > 0) rooms.push({ name: '👩‍⚕️ แชทผู้เชี่ยวชาญ', lastMsg: expertChats[expertChats.length - 1]?.content || '', action: 'openExpertChat()' });
+
+  const commRoomIds = [...new Set(allData.filter(d => d.type === 'comm_msg').map(d => d.room_id))];
+  commRoomIds.forEach(rid => {
+    const msgs = allData.filter(d => d.type === 'comm_msg' && d.room_id === rid);
+    const room = defaultRooms.find(r => r.id === rid) || allData.find(d => d.type === 'community_room' && d.room_id === rid);
+    const name = room ? (room.name || room.room_name) : rid;
+    rooms.push({ name: `👥 ${name}`, lastMsg: msgs[msgs.length - 1]?.content || '', action: `enterCommunityRoom('${rid}','${(name || '').replace(/'/g, "\\'")}')`});
+  });
+
+  container.innerHTML = rooms.length === 0
+    ? '<p style="text-align:center;color:var(--text-secondary);font-size:14px;padding:40px 0;">ยังไม่มีการสนทนา 💭</p>'
+    : rooms.map(r => `
+      <div class="feature-card" onclick="${r.action}" style="padding:14px;">
+        <h4 style="margin:0;font-size:15px;color:var(--text-primary);">${r.name}</h4>
+        <p style="margin:4px 0 0;font-size:12px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${r.lastMsg}</p>
+      </div>`).join('');
+}
+
+// ==================== SENTIMENT / QUIZ ====================
+const quizQuestions = [
+  {
+    q: "ในช่วง 2 สัปดาห์ที่ผ่านมา คุณรู้สึกเศร้า หดหู่ หรือท้อแท้บ่อยแค่ไหน",
+    opts: ["ไม่เลย", "บ้างวัน", "มากกว่าครึ่งวัน", "เกือบทุกวัน"],
+    scores: [0, 1, 2, 3]
+  },
+  {
+    q: "คุณรู้สึกขาดความสนใจหรือความสุขในการทำกิจกรรมประจำวันบ่อยไหม",
+    opts: ["ไม่เลย", "บ้างวัน", "มากกว่าครึ่งวัน", "เกือบทุกวัน"],
+    scores: [0, 1, 2, 3]
+  },
+  {
+    q: "คุณประเมินคุณภาพการนอนหลับของคุณว่าเป็นอย่างไร",
+    opts: ["ดีมาก", "ดี", "แย่", "แย่มาก"],
+    scores: [0, 1, 2, 3]
+  },
+  {
+    q: "คุณรู้สึกวิตกังวลหรือห่วงใจบ่อยไหม",
+    opts: ["ไม่เลย", "บ้างครั้ง", "บ่อย", "เกือบตลอด"],
+    scores: [0, 1, 2, 3]
+  },
+  {
+    q: "คุณรู้สึกเชื่อมต่อกับคนรอบตัวคุณแค่ไหน",
+    opts: ["เชื่อมต่อดีมาก", "เชื่อมต่อค่อนข้างดี", "รู้สึกโดดเดี่ยวบ้าง", "รู้สึกโดดเดี่ยวมาก"],
+    scores: [0, 1, 2, 3]
+  },
+  {
+    q: "คุณสามารถจัดการความเครียดในแต่ละวันได้ดีแค่ไหน",
+    opts: ["ดีมาก", "ค่อนข้างดี", "ยากบ้าง", "ยากมาก"],
+    scores: [0, 1, 2, 3]
+  },
+  {
+    q: "คุณทำกิจกรรมที่ชอบบ่อยแค่ไหน",
+    opts: ["ทุกวัน", "สัปดาห์ละสองสามครั้ง", "ไม่บ่อย", "แทบไม่เลย"],
+    scores: [0, 1, 2, 3]
+  },
+  {
+    q: "ระดับพลังงานของคุณตอนนี้เป็นอย่างไร",
+    opts: ["มีพลังสูง", "พลังปานกลาง", "พลังน้อย", "พลังต่ำมาก"],
+    scores: [0, 1, 2, 3]
+  },
+  {
+    q: "คุณรู้สึกหนักใจจากความรับผิดชอบบ่อยไหม",
+    opts: ["ไม่เลย", "บ้างครั้ง", "บ่อย", "เกือบตลอด"],
+    scores: [0, 1, 2, 3]
+  },
+  {
+    q: "คุณหวังดีเกี่ยวกับอนาคตแค่ไหน",
+    opts: ["หวังดีมาก", "หวังดีพอสมควร", "หวังดีน้อย", "หวังดีแทบไม่เลย"],
+    scores: [0, 1, 2, 3]
+  }
+];
+
+let quizStep = 0;
+let quizAnswers = [];
+
+function startQuiz() {
+  quizStep = 0;
+  quizAnswers = [];
+  showAppView('quizView');
+  renderQuizStep();
+}
+
+function renderQuizStep() {
+  const container = document.getElementById('quizContent');
+  if (quizStep >= quizQuestions.length) {
+    finishQuiz();
+    return;
+  }
+  const q = quizQuestions[quizStep];
+  container.innerHTML = `
+    <div class="glass-card" style="padding:20px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+        <span style="font-size:13px;color:var(--text-secondary);">คำถามที่ ${quizStep + 1} จาก ${quizQuestions.length}</span>
+        <div style="width:100px;height:6px;border-radius:3px;background:rgba(196,181,253,0.2);overflow:hidden;">
+          <div style="width:${((quizStep + 1) / quizQuestions.length) * 100}%;height:100%;border-radius:3px;background:linear-gradient(90deg,#f9a8d4,#93c5fd);transition:width 0.3s;"></div>
+        </div>
+      </div>
+      <p style="font-size:16px;color:var(--text-primary);font-weight:600;margin:0 0 16px;line-height:1.5;">${q.q}</p>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        ${q.opts.map((opt, i) => `
+          <div class="quiz-option" id="qopt-${i}" onclick="selectQuizOption(${i})" style="font-family:'Quicksand','Noto Sans Thai',sans-serif;">${opt}</div>
+        `).join('')}
+      </div>
+      <button id="quizNextBtn" class="btn-gradient" style="width:100%;padding:10px;font-size:14px;margin-top:16px;opacity:0.5;pointer-events:none;" onclick="nextQuizStep()">ถัดไป →</button>
+    </div>`;
+}
+
+let selectedQuizOption = -1;
+
+function selectQuizOption(idx) {
+  selectedQuizOption = idx;
+  document.querySelectorAll('.quiz-option').forEach((el, i) => {
+    el.classList.toggle('selected', i === idx);
+  });
+  const btn = document.getElementById('quizNextBtn');
+  btn.style.opacity = '1';
+  btn.style.pointerEvents = 'auto';
+}
+
+function nextQuizStep() {
+  if (selectedQuizOption < 0) return;
+  quizAnswers.push(quizQuestions[quizStep].scores[selectedQuizOption]);
+  selectedQuizOption = -1;
+  quizStep++;
+  renderQuizStep();
+}
+
+async function finishQuiz() {
+  const totalScore = quizAnswers.reduce((a, b) => a + b, 0);
+  const maxScore = quizQuestions.length * 3;
+  const percentage = Math.round((totalScore / maxScore) * 100);
+
+  const categories = {
+    mood: Math.round(((3 - quizAnswers[0]) / 3) * 100),
+    interest: Math.round(((3 - quizAnswers[1]) / 3) * 100),
+    sleep: Math.round(((3 - quizAnswers[2]) / 3) * 100),
+    anxiety: Math.round(((3 - quizAnswers[3]) / 3) * 100),
+    connection: Math.round(((3 - quizAnswers[4]) / 3) * 100),
+    stress: Math.round(((3 - quizAnswers[5]) / 3) * 100),
+    enjoyment: Math.round(((3 - quizAnswers[6]) / 3) * 100),
+    energy: Math.round(((3 - quizAnswers[7]) / 3) * 100),
+    overwhelm: Math.round(((3 - quizAnswers[8]) / 3) * 100),
+    hope: Math.round(((3 - quizAnswers[9]) / 3) * 100)
+  };
+
+  const wellbeing = 100 - percentage;
+  let level, emoji, advice;
+  if (wellbeing >= 80) { level = 'ดีเยี่ยม'; emoji = '🌟'; advice = 'คุณกำลังทำได้ดีมาก ให้ดำเนินการหารักษาสุขภาพจิตต่อไป'; }
+  else if (wellbeing >= 60) { level = 'ดี'; emoji = '😊'; advice = 'คุณกำลังดีโดยทั่วไป พยายามเสริมจุดที่อ่อนแอลง'; }
+  else if (wellbeing >= 40) { level = 'ปานกลาง'; emoji = '🌤️'; advice = 'อาจเป็นประโยชน์ในการขอความสนับสนุน พูดคุยกับเพื่อนหรือที่ปรึกษา'; }
+  else if (wellbeing >= 20) { level = 'ต้องใจ้ความสนใจ'; emoji = '💙'; advice = 'ดูเหมือนคุณกำลังผ่านช่วงยากลำบาก ขอให้คิดถึงการติดต่อผู้เชี่ยวชาญ'; }
+  else { level = 'ต้องขอความช่วยเหลือด่วน'; emoji = '🤗'; advice = 'คุณไม่ได้อยู่คนเดียว โปรดติดต่อผู้เชี่ยวชาญสุขภาพจิตโดยด่วน'; }
+
+  if (window.dataSdk) {
+    await window.dataSdk.create({
+      type: 'sentiment',
+      sentiment_score: wellbeing,
+      sentiment_date: new Date().toISOString(),
+      sender: currentUser.username,
+      content: level
+    });
+  }
+
+  const container = document.getElementById('quizContent');
+  container.innerHTML = `
+    <div class="glass-card" style="padding:24px;text-align:center;">
+      <div style="font-size:48px;margin-bottom:12px;">${emoji}</div>
+      <h3 style="margin:0 0 8px;font-size:22px;color:var(--text-primary);font-family:'Caveat',cursive;">คะแนนสุขภาพจิตของคุณ</h3>
+      <div style="font-size:48px;font-weight:700;color:${wellbeing >= 60 ? '#10b981' : wellbeing >= 40 ? '#f59e0b' : '#ef4444'};margin:8px 0;">${wellbeing}%</div>
+      <p style="font-size:16px;font-weight:600;color:var(--text-primary);margin:0 0 12px;">${level}</p>
+      <p style="font-size:14px;color:var(--text-secondary);line-height:1.6;margin:0 0 20px;">${advice}</p>
+
+      <div style="text-align:left;margin-bottom:20px;">
+        <h4 style="margin:0 0 12px;font-size:14px;color:var(--text-primary);font-weight:600;">รายละเอียดการวิเคราะห์</h4>
+        <div style="display:flex;flex-direction:column;gap:10px;font-size:12px;">
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+              <span style="color:var(--text-primary);">อารมณ์:</span>
+              <span style="color:var(--text-secondary);">${categories.mood}%</span>
+            </div>
+            <div style="height:8px;border-radius:4px;background:rgba(196,181,253,0.2);overflow:hidden;">
+              <div class="sentiment-bar" style="width:${categories.mood}%;background:linear-gradient(90deg,${categories.mood >= 60 ? '#10b981,#34d399' : categories.mood >= 40 ? '#f59e0b,#fbbf24' : '#ef4444,#f87171'});"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+              <span style="color:var(--text-primary);">ความสนใจ:</span>
+              <span style="color:var(--text-secondary);">${categories.interest}%</span>
+            </div>
+            <div style="height:8px;border-radius:4px;background:rgba(196,181,253,0.2);overflow:hidden;">
+              <div class="sentiment-bar" style="width:${categories.interest}%;background:linear-gradient(90deg,${categories.interest >= 60 ? '#10b981,#34d399' : categories.interest >= 40 ? '#f59e0b,#fbbf24' : '#ef4444,#f87171'});"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+              <span style="color:var(--text-primary);">การนอนหลับ:</span>
+              <span style="color:var(--text-secondary);">${categories.sleep}%</span>
+            </div>
+            <div style="height:8px;border-radius:4px;background:rgba(196,181,253,0.2);overflow:hidden;">
+              <div class="sentiment-bar" style="width:${categories.sleep}%;background:linear-gradient(90deg,${categories.sleep >= 60 ? '#10b981,#34d399' : categories.sleep >= 40 ? '#f59e0b,#fbbf24' : '#ef4444,#f87171'});"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+              <span style="color:var(--text-primary);">ความกังวล:</span>
+              <span style="color:var(--text-secondary);">${categories.anxiety}%</span>
+            </div>
+            <div style="height:8px;border-radius:4px;background:rgba(196,181,253,0.2);overflow:hidden;">
+              <div class="sentiment-bar" style="width:${categories.anxiety}%;background:linear-gradient(90deg,${categories.anxiety >= 60 ? '#10b981,#34d399' : categories.anxiety >= 40 ? '#f59e0b,#fbbf24' : '#ef4444,#f87171'});"></div>
+            </div>
+          </div>
+          <div>
+            <div style="display:flex;justify-content:space-between;margin-bottom:3px;">
+              <span style="color:var(--text-primary);">ความเชื่อมต่อ:</span>
+              <span style="color:var(--text-secondary);">${categories.connection}%</span>
+            </div>
+            <div style="height:8px;border-radius:4px;background:rgba(196,181,253,0.2);overflow:hidden;">
+              <div class="sentiment-bar" style="width:${categories.connection}%;background:linear-gradient(90deg,${categories.connection >= 60 ? '#10b981,#34d399' : categories.connection >= 40 ? '#f59e0b,#fbbf24' : '#ef4444,#f87171'});"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="showAppView('profileView');switchNav('navProfile')" class="btn-gradient" style="width:100%;padding:10px;font-size:14px;">กลับไปที่โปรไฟล์</button>
+    </div>`;
+}
+
+function renderSentiment() {
+  const container = document.getElementById('sentimentBars');
+  if (!container) return;
+  const sentiments = allData.filter(d => d.type === 'sentiment').sort((a, b) => new Date(a.sentiment_date) - new Date(b.sentiment_date));
+  if (sentiments.length === 0) {
+    container.innerHTML = '<p style="text-align:center;color:var(--text-secondary);font-size:13px;">ทำแบบทดสอบเพื่อดูผลลัพธ์!</p>';
+    return;
+  }
+  const recent = sentiments.slice(-5);
+  container.innerHTML = `
+    <div style="display:flex;align-items:flex-end;gap:8px;height:100px;justify-content:center;margin-bottom:8px;">
+      ${recent.map(s => {
+        const h = Math.max(10, s.sentiment_score || 0);
+        const color = h >= 60 ? '#10b981' : h >= 40 ? '#f59e0b' : '#ef4444';
+        const d = new Date(s.sentiment_date);
+        const label = `${d.getDate()}/${d.getMonth() + 1}`;
+        return `<div style="display:flex;flex-direction:column;align-items:center;gap:4px;">
+          <span style="font-size:10px;color:var(--text-secondary);">${s.sentiment_score}%</span>
+          <div style="width:28px;height:${h}%;background:${color};border-radius:6px 6px 0 0;transition:height 0.5s;"></div>
+          <span style="font-size:9px;color:var(--text-secondary);">${label}</span>
+        </div>`;
+      }).join('')}
+    </div>
+    <p style="text-align:center;font-size:12px;color:var(--text-secondary);margin:0;">ล่าสุด: ${recent[recent.length - 1].content} (${recent[recent.length - 1].sentiment_score}%)</p>`;
+}
+
+// ==================== HELPERS ====================
+function getTimeAgo(timestamp) {
+  if (!timestamp) return '';
+  const diff = Date.now() - new Date(timestamp).getTime();
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'เมื่อสักครู่';
+  if (mins < 60) return `${mins}นาทีที่แล้ว`;
+  const hrs = Math.floor(mins / 60);
+  if (hrs < 24) return `${hrs}ชั่วโมงที่แล้ว`;
+  const days = Math.floor(hrs / 24);
+  return `${days}วันที่แล้ว`;
+}
+</script>
+ <script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'9ccbfe7a62b64493',t:'MTc3MDg5ODM0NC4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</html>
